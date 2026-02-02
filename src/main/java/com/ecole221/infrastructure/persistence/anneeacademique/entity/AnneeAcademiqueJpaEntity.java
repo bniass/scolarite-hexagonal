@@ -1,0 +1,38 @@
+package com.ecole221.infrastructure.persistence.anneeacademique.entity;
+
+import com.ecole221.domain.entity.academic.Statut;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "annee_academique")
+public class AnneeAcademiqueJpaEntity {
+
+    @Id
+    @Column(nullable = false, unique = true, length = 12)
+    private String code;
+
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
+    private LocalDate dateDebutInscriptions;
+    private LocalDate dateFinInscriptions;
+
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
+
+    private LocalDate datePublication;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "annee_mois",
+            joinColumns = @JoinColumn(name = "annee_id")
+    )
+    private List<MoisAcademiqueEmbeddable> moisAcademiques = new ArrayList<>();
+}

@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: scolarite-hexagonal
+
+  profiles:
+    active: mysql
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url:  jdbc:mysql://localhost:8889/hexagonal-ddd
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show_sql: true
+
+  kafka:
+    bootstrap-servers: localhost:19092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 2147483647
+      delivery-timeout-ms: 120000
+      request-timeout-ms: 30000
+      linger-ms: 5
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+
+server:
+  port: 8005
+
+scolarite:
+  transfert:
+    delai-max-mois: 1

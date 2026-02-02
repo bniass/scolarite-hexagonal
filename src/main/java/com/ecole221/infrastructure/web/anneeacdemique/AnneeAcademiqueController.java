@@ -1,0 +1,87 @@
+package com.ecole221.infrastructure.web.anneeacdemique;
+
+import com.ecole221.application.command.anneeacademique.*;
+import com.ecole221.application.port.in.anneeacademique.*;
+import com.ecole221.application.query.anneeacademique.AnneeAcademiqueView;
+import com.ecole221.infrastructure.web.anneeacdemique.request.CreerAnneeAcademiqueRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+@RestController
+@RequestMapping("/api/academic-years")
+public class AnneeAcademiqueController {
+    private final SuspendreInscriptionUseCase suspendreUC;
+    private final FermerInscriptionUseCase fermerUC;
+    private final CreerAnneeAcademiqueUseCase creerUC;
+    private final PublierAnneeAcademiqueUseCase publierUC;
+    private final OuvrirInscriptionUseCase ouvrirUC;
+    private final CloturerAnneeScolaireUseCase cloturerUC;
+    private final ConsulterAnneeAcademiqueUseCase consulterUC;
+
+    public AnneeAcademiqueController(
+            SuspendreInscriptionUseCase suspendreUC, FermerInscriptionUseCase fermerUC,
+            CreerAnneeAcademiqueUseCase creerUC,
+            PublierAnneeAcademiqueUseCase publierUC,
+            OuvrirInscriptionUseCase ouvrirUC,
+            CloturerAnneeScolaireUseCase cloturerUC,
+            ConsulterAnneeAcademiqueUseCase consulterUC
+    ) {
+        this.suspendreUC = suspendreUC;
+        this.fermerUC = fermerUC;
+        this.creerUC = creerUC;
+        this.publierUC = publierUC;
+        this.ouvrirUC = ouvrirUC;
+        this.cloturerUC = cloturerUC;
+        this.consulterUC = consulterUC;
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> creer(@RequestBody CreerAnneeAcademiqueRequest request) {
+        creerUC.executer(AnneeAcademiqueMapper.toCommand(request));
+
+        URI location = URI.create("/api/annees-academiques/" + request.code());
+
+        return ResponseEntity
+                .created(location)
+                .build();
+    }
+
+
+    @PostMapping("/{code}/publish")
+    public ResponseEntity<Void> publier(@PathVariable String code) {
+        publierUC.executer(new PublierAnneeAcademiqueCommand(Integer.parseInt(code)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/open-enrollments")
+    public ResponseEntity<Void> ouvrirInscriptions(@PathVariable String code) {
+        ouvrirUC.executer(new OuvrirInscriptionCommand(Integer.parseInt(code)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/pending-enrollments")
+    public ResponseEntity<Void> suspendreInscriptions(@PathVariable String code) {
+        suspendreUC.executer(new SuspendreInscriptionCommand(Integer.parseInt(code)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/close-enrollments")
+    public ResponseEntity<Void> fermerInscriptions(@PathVariable String code) {
+        fermerUC.executer(new FermerInscriptionCommand(Integer.parseInt(code)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/close")
+    public ResponseEntity<Void> cloturer(@PathVariable String code) {
+        cloturerUC.executer(new CloturerAnneeAcademiqueCommand(Integer.parseInt(code)));
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{code}")
+    public ResponseEntity<AnneeAcademiqueView> consulter(@PathVariable String code) {
+        return ResponseEntity.ok(consulterUC.executer(code));
+    }
+}
+
