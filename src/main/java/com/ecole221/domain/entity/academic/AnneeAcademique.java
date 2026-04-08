@@ -1,16 +1,17 @@
 package com.ecole221.domain.entity.academic;
 
-import com.ecole221.domain.event.shared.AggregateRoot;
+import com.ecole221.domain.event.anneeacademic.*;
+import com.ecole221.domain.event.shared.EventAggregateRoot;
 import com.ecole221.domain.exception.ScolariteException;
+import com.ecole221.domain.shared.AggregateRoot;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AnneeAcademique extends AggregateRoot {
+public class AnneeAcademique extends EventAggregateRoot implements AggregateRoot<AnneeAcademiqueId> {
 
     private static final int DUREE_ANNEE_SCOLAIRE_MOIS = 9;
 
@@ -34,8 +35,8 @@ public class AnneeAcademique extends AggregateRoot {
     }
 
     public static AnneeAcademique reconstituer(String code, DatesAnnee datesAnnee, LocalDate datePublication, EtatAnnee etat, List<MoisAcademique> mois) {
-        String[] annees = code.split("-");
-        AnneeAcademiqueId id = new AnneeAcademiqueId(Integer.parseInt(annees[0]), Integer.parseInt(annees[1]));
+        code = code.substring(0, 4);
+        AnneeAcademiqueId id = new AnneeAcademiqueId(Integer.parseInt(code));
         AnneeAcademique annee = new AnneeAcademique(id);
         annee.dateDebut = datesAnnee.getDateDebut();
         annee.dateFin = datesAnnee.getDateFin();
@@ -53,31 +54,40 @@ public class AnneeAcademique extends AggregateRoot {
 
     public void creer(DatesAnnee datesAnnee) {
         etat.creer(this, datesAnnee);
+        addEvent(new AnneeAcademiqueCreeeEvent(this));
     }
 
     public void modifier(DatesAnnee datesAnnee) {
         etat.modifier(this, datesAnnee);
+        addEvent(new AnneeAcademiqueModifieEvent(this));
     }
 
     public void publier() {
         etat.publier(this);
         this.datePublication = LocalDate.now();
+        addEvent(new AnneeAcademiquePublieeEvent(this));
     }
 
     public void ouvrirInscriptions() {
         etat.ouvrirInscriptions(this);
+        addEvent(new InscriptionsOuvertesEvent(this, getDateOuvertureInscription(), getDateFinInscription()));
     }
 
     public void cloturer() {
         etat.cloturer(this);
+        addEvent(new AnneeAcademiqueClotureeEvent(this));
     }
 
     public void suspendreInscriptions() {
         etat.suspendreInscriptions(this);
+        addEvent(new InscriptionsSuspenduesEvent(this));
+
     }
 
     public void fermerInscriptions(){
         etat.fermerInscriptions(this);
+        addEvent(new InscriptionsFermeesEvent(this));
+
     }
 
     /* =======================
@@ -195,8 +205,7 @@ public class AnneeAcademique extends AggregateRoot {
     }
 
     void recalculerMois(List<MoisAcademique> moisAcademiques) {
-        this.moisAcademiques.clear();
-        this.moisAcademiques.addAll(moisAcademiques);
+        this.moisAcademiques = new ArrayList<>(moisAcademiques);
     }
 
     public void verifierInscriptionsOuvertes() {

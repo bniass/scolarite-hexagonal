@@ -7,10 +7,10 @@ public final class AnneeAcademiqueId extends EntityId<String> {
     private final int debut;
     private final int fin;
 
-    public AnneeAcademiqueId(int debut, int fin) {
-        super(validerEtConstruire(debut, fin));
+    public AnneeAcademiqueId(int debut) {
+        super(validerEtConstruire(debut, debut + 1));
         this.debut = debut;
-        this.fin = fin;
+        this.fin = debut + 1;
     }
 
     private static String validerEtConstruire(int debut, int fin) {
@@ -28,5 +28,10 @@ public final class AnneeAcademiqueId extends EntityId<String> {
 
     public int fin() {
         return fin;
+    }
+
+    @Override
+    public String toString() {
+        return debut + "-" + fin;
     }
 }

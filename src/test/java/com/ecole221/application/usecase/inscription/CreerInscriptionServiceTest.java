@@ -100,7 +100,7 @@ class CreerInscriptionServiceTest {
     // ============================
 
     private AnneeAcademique creerAnneeOuverte() {
-        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025, 2026));
+        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025));
 
         a.creer(
                 new DatesAnnee(
@@ -117,7 +117,7 @@ class CreerInscriptionServiceTest {
     }
 
     private AnneeAcademique creerAnneePublieeMaisNonOuverte() {
-        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025, 2026));
+        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025));
         a.creer(new DatesAnnee(
                 LocalDate.of(2025, 10, 1),
                 LocalDate.of(2026, 6, 30),

@@ -3,9 +3,12 @@ package com.ecole221.infrastructure.persistence.inscription.mapper;
 import com.ecole221.domain.entity.academic.AnneeAcademique;
 import com.ecole221.domain.entity.academic.AnneeAcademiqueId;
 import com.ecole221.domain.entity.inscription.Inscription;
+import com.ecole221.domain.entity.inscription.InscriptionCreationSnapshot;
 import com.ecole221.domain.entity.inscription.InscriptionId;
+import com.ecole221.domain.entity.school.CodeClasse;
 import com.ecole221.domain.entity.student.Matricule;
 import com.ecole221.infrastructure.persistence.anneeacademique.entity.AnneeAcademiqueJpaEntity;
+import com.ecole221.infrastructure.persistence.classe.entity.ClasseJpaEntity;
 import com.ecole221.infrastructure.persistence.classe.mapper.ClassePersistenceMapper;
 import com.ecole221.infrastructure.persistence.etudiant.entity.EtudiantJpaEntity;
 import com.ecole221.infrastructure.persistence.inscription.entity.InscriptionJpaEntity;
@@ -30,7 +33,7 @@ public class InscriptionPersistenceMapper {
         entity.setId(
                 new InscriptionJpaId(
                         domain.getId().getMatricule().value(),
-                        domain.getId().getAnneeAcademique().getId().value()
+                        domain.getId().getAnneeAcademiqueId().value()
                 )
         );
 
@@ -38,11 +41,11 @@ public class InscriptionPersistenceMapper {
         entity.setDateInscription(domain.getDateInscription());
 
         // 3️⃣ Classe (agrégat référencé)
-        entity.setClasse(
-                classePersistenceMapper.toJpa(
-                        domain.classeCourante()
-                )
-        );
+
+        ClasseJpaEntity classeJpaEntity = new ClasseJpaEntity();
+        classeJpaEntity.setCode(domain.getCodeClasse().value());
+
+        entity.setClasse(classeJpaEntity);
 
         // 4️⃣ Étudiant (référence par identité)
         EtudiantJpaEntity etudiantRef = new EtudiantJpaEntity();
@@ -54,7 +57,7 @@ public class InscriptionPersistenceMapper {
         // 5️⃣ Année académique (référence par identité)
         AnneeAcademiqueJpaEntity anneeRef = new AnneeAcademiqueJpaEntity();
         anneeRef.setCode(
-                domain.getId().getAnneeAcademique().getId().value()
+                domain.getId().getAnneeAcademiqueId().value()
         );
         entity.setAnneeAcademique(anneeRef);
 
@@ -62,24 +65,24 @@ public class InscriptionPersistenceMapper {
     }
 
     public Inscription toDomain(InscriptionJpaEntity entity) {
-
-        return new Inscription(
-                new InscriptionId(
-                        new Matricule(
-                                entity.getEtudiant().getMatricule()
-                        ),
-                        new AnneeAcademique(
+        return Inscription.creerNouvelle(
+                new InscriptionCreationSnapshot(
+                        new InscriptionId(
+                                new Matricule(
+                                        entity.getEtudiant().getMatricule()
+                                ),
                                 new AnneeAcademiqueId(
-                                        Integer.parseInt(entity.getAnneeAcademique().getCode().split("-")[0]),
-                                        Integer.parseInt(entity.getAnneeAcademique().getCode().split("-")[1])
+                                        Integer.parseInt(entity.getAnneeAcademique().getCode().split("-")[0])
                                 )
-                        )
-                ),
-                classePersistenceMapper.toDomain(
-                        entity.getClasse()
-                ),
-                entity.getDateInscription()
+                        ),
+                        new CodeClasse(entity.getClasse().getCode()),
+                        null,
+                        null,
+                        null
+
+                )
         );
+
     }
 }
 

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class OutboxEventScheduler {
@@ -18,8 +20,8 @@ public class OutboxEventScheduler {
     @Transactional
     public void publishPendingEvents() {
 
-        var events = repository.findTop50ByStatusOrderByOccurredAt(
-                OutboxStatus.PENDING
+        var events = repository.findTop50ByStatusInOrderByOccurredAtAsc(
+                List.of(OutboxStatus.PENDING, OutboxStatus.FAILED)
         );
 
         for (var event : events) {

@@ -31,6 +31,6 @@ public abstract class InscriptionEvent implements DomainEvent {
 
     @Override
     public String aggregateId() {
-        return inscriptionId.value();
+        return inscriptionId.getMatricule().value()+"_"+inscriptionId.getAnneeAcademiqueId().value();
     }
 }

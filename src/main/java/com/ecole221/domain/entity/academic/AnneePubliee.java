@@ -8,6 +8,5 @@ public class AnneePubliee extends AbstractEtatAnnee{
     @Override
     public void ouvrirInscriptions(AnneeAcademique annee) {
         annee.changerEtat(new InscriptionsOuvertes());
-        annee.addEvent(new InscriptionsOuvertesEvent(annee, annee.getDateOuvertureInscription(), annee.getDateFinInscription()));
     }
 }

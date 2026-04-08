@@ -1,7 +1,7 @@
 package com.ecole221.infrastructure.config;
 
-import com.ecole221.domain.policy.RegleTransfert;
-import com.ecole221.domain.policy.RegleTransfertSousDelai;
+import com.ecole221.domain.policy.inscription.RegleTransfert;
+import com.ecole221.domain.policy.inscription.RegleTransfertSousDelai;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

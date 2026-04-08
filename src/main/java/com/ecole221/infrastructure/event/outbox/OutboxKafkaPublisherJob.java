@@ -27,7 +27,7 @@ public class OutboxKafkaPublisherJob {
     public void publishPendingEvents() {
 
         List<OutboxEventJpaEntity> pending =
-                outboxRepo.findTop50ByStatusOrderByOccurredAt(OutboxStatus.PENDING);
+                outboxRepo.findTop50ByStatusInOrderByOccurredAtAsc(List.of(OutboxStatus.PENDING, OutboxStatus.FAILED));
 
         for (OutboxEventJpaEntity event : pending) {
             try {

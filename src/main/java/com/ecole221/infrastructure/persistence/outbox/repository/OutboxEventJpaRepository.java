@@ -9,7 +9,8 @@ import java.util.List;
 public interface OutboxEventJpaRepository
         extends JpaRepository<OutboxEventJpaEntity, Long> {
 
-    List<OutboxEventJpaEntity> findTop50ByStatusOrderByOccurredAt(
-            OutboxStatus status
+    List<OutboxEventJpaEntity>
+    findTop50ByStatusInOrderByOccurredAtAsc(
+            List<OutboxStatus> statuses
     );
 }

@@ -1,39 +1,79 @@
 package com.ecole221.domain.entity.inscription;
 
+import com.ecole221.domain.entity.school.CodeClasse;
+import com.ecole221.domain.event.inscription.InscriptionConfirmeeEvent;
+import com.ecole221.domain.event.inscription.InscriptionCreeeEvent;
+import com.ecole221.domain.event.inscription.InscriptionInvalideeEvent;
+import com.ecole221.domain.event.shared.EventAggregateRoot;
 import com.ecole221.domain.exception.ScolariteException;
 import com.ecole221.domain.exception.TransfertNonAutoriseException;
-import com.ecole221.domain.entity.school.Classe;
-import com.ecole221.domain.policy.RegleTransfert;
-import com.ecole221.domain.shared.AggregateRoot;
+import com.ecole221.domain.policy.inscription.RegleTransfert;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.UUID;
 
-public class Inscription implements AggregateRoot<InscriptionId> {
+public class Inscription extends EventAggregateRoot {
+
+    private static final int DELAI_PAIEMENT_JOURS = 14;
+
     private final InscriptionId id;
-    private Classe classe;
+    private CodeClasse codeClasse;
     private final LocalDate dateInscription;
+    private EtatInscription etat;
+    private StatutInscription statutInscription;
 
-    public Inscription(InscriptionId id, Classe classe, LocalDate dateInscription) {
-        this.id = id;
-        this.classe = classe;
-        this.dateInscription = dateInscription;
+
+    /* =======================
+       CONSTRUCTEUR / FACTORY
+       ======================= */
+
+    private Inscription(InscriptionId id, CodeClasse codeClasse, LocalDate dateInscription) {
+        this.id = Objects.requireNonNull(id);
+        this.codeClasse = Objects.requireNonNull(codeClasse);
+        this.dateInscription = Objects.requireNonNull(dateInscription);
+        this.etat = EtatInscription.EN_ATTENTE_PAIEMENT;
     }
 
-    public Inscription creerNouvelle(InscriptionId id, Classe classe) {
-        return new Inscription(id, classe, LocalDate.now());
+    public static Inscription creerNouvelle(InscriptionCreationSnapshot snapshot) {
+        Inscription inscription = new Inscription(snapshot.inscriptionId(), snapshot.codeClasse(), LocalDate.now());
+        //doit déclencher le context Paiement qui initialise les futurs paiements de l'étudiant
+        //12 lignes créer dans la table inscription (Frais inscription, autres frais et 9 mois avec le statut impayé
+        inscription.addEvent(new InscriptionCreeeEvent(snapshot));
+        return inscription;
     }
 
-    @Override
-    public InscriptionId getId() {
-        return id;
+    /* =======================
+       COMPORTEMENTS METIER
+       ======================= */
+
+    public void confirmerInscription() {
+        verifierEtat(EtatInscription.PAYEE);
+        this.etat = EtatInscription.CONFIRMEE;
+        addEvent(new InscriptionConfirmeeEvent(this.id));
     }
 
-    public void transfererVers(Classe nouvelleClasse, LocalDate dateTransfert, RegleTransfert regleTransfert) {
+    public void invalider(String motif) {
+        this.etat = EtatInscription.INVALIDEE;
+        addEvent(new InscriptionInvalideeEvent(this.id, motif));
+    }
+
+    /* =======================
+       TRANSFERT DE CLASSE
+       ======================= */
+
+    public void transfererVers(
+            CodeClasse nouvelleClasse,
+            LocalDate dateTransfert,
+            RegleTransfert regleTransfert
+    ) {
+        verifierEtat(EtatInscription.CONFIRMEE);
+
         Objects.requireNonNull(nouvelleClasse);
         Objects.requireNonNull(regleTransfert);
 
-        if (nouvelleClasse.equals(this.classe)) {
+        if (nouvelleClasse.equals(this.codeClasse)) {
             throw new ScolariteException(
                     "La classe de destination est identique à la classe courante"
             );
@@ -42,41 +82,59 @@ public class Inscription implements AggregateRoot<InscriptionId> {
         if (!regleTransfert.estAutorise(
                 this.dateInscription,
                 dateTransfert,
-                this.classe,
+                this.codeClasse,
                 nouvelleClasse
         )) {
             throw new TransfertNonAutoriseException(
                     id.getMatricule().value(),
-                    id.getAnneeAcademique().toString()
+                    id.getAnneeAcademiqueId().value()
             );
         }
 
-        this.classe = nouvelleClasse;
+        this.codeClasse = nouvelleClasse;
     }
 
-    public Classe classeCourante() {
-        return classe;
-    }
+    /* =======================
+       REGLES INTERNES
+       ======================= */
 
-    public boolean estDansLaClasse(Classe classe) {
-        return this.classe.equals(classe);
-    }
-
-    public boolean transfertPossible(LocalDate aujourdHui) {
-        return !dateInscription.plusMonths(1).isBefore(aujourdHui);
-    }
-
-    public void transfererVers(Classe nouvelleClasse, LocalDate aujourdHui) {
-        if (!transfertPossible(aujourdHui)) {
-            throw new TransfertNonAutoriseException(
-                    id.getMatricule().value(),
-                    id.getAnneeAcademique().toString()
-            );
+    public void verifierEtat(EtatInscription... etatsAutorises) {
+        for (EtatInscription etatAutorise : etatsAutorises) {
+            if (this.etat == etatAutorise) {
+                return;
+            }
         }
-        this.classe = nouvelleClasse;
+        throw new ScolariteException(
+                "Action interdite dans l'état " + this.etat
+        );
+    }
+
+    private boolean paiementHorsDelai() {
+        long jours = ChronoUnit.DAYS.between(
+                dateInscription,
+                LocalDate.now()
+        );
+        return jours > DELAI_PAIEMENT_JOURS;
+    }
+
+    /* =======================
+       GETTERS
+       ======================= */
+
+    public InscriptionId getId() {
+        return id;
+    }
+
+    public CodeClasse getCodeClasse() {
+        return codeClasse;
     }
 
     public LocalDate getDateInscription() {
         return dateInscription;
     }
+
+    public EtatInscription getEtat() {
+        return etat;
+    }
+
 }

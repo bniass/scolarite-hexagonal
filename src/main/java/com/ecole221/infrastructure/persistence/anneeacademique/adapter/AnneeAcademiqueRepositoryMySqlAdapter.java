@@ -28,7 +28,17 @@ public class AnneeAcademiqueRepositoryMySqlAdapter
 
     @Override
     public void save(AnneeAcademique annee) {
-        jpaRepository.save(mapper.toJpa(annee));
+        AnneeAcademiqueJpaEntity entity =
+                jpaRepository.findByCode(annee.getId().value())
+                        .orElseGet(() ->
+                                mapper.toJpa(annee) // CREATE
+                        );
+
+        if (entity.getCode() != null) {
+            mapper.updateJpa(annee, entity); // UPDATE
+        }
+
+        jpaRepository.save(entity);
     }
 }
 

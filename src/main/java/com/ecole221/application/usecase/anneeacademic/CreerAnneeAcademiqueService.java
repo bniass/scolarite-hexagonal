@@ -36,7 +36,7 @@ public class CreerAnneeAcademiqueService
     public void executer(CreerAnneeAcademiqueCommand cmd) {
 
         AnneeAcademiqueId id =
-                new AnneeAcademiqueId(cmd.codeAnnee(), cmd.codeAnnee() + 1);
+                new AnneeAcademiqueId(cmd.codeAnnee());
 
         if (repository.findByCode(id.value()).isPresent()) {
             throw new ScolariteNotFoundException(

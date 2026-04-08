@@ -2,6 +2,7 @@ package com.ecole221.infrastructure.persistence.inscription.adapter;
 
 import com.ecole221.application.port.out.repository.InscriptionRepository;
 import com.ecole221.domain.entity.inscription.Inscription;
+import com.ecole221.domain.entity.inscription.InscriptionId;
 import com.ecole221.infrastructure.persistence.anneeacademique.repository.AnneeAcademiqueJpaRepository;
 import com.ecole221.infrastructure.persistence.etudiant.repository.EtudiantJpaRepository;
 import com.ecole221.infrastructure.persistence.inscription.entity.InscriptionJpaEntity;
@@ -42,6 +43,13 @@ public class InscriptionMysqlRepositoryAdapter  implements InscriptionRepository
     }
 
     @Override
+    public boolean existsByMatriculeAndAnnee(String matricule, String anneeAcademic) {
+        return inscriptionJpaRepository.existsByEtudiant_MatriculeAndAnneeAcademique_Code(
+                matricule, anneeAcademic
+        );
+    }
+
+    @Override
     public long count() {
         return inscriptionJpaRepository.count();
     }
@@ -55,5 +63,12 @@ public class InscriptionMysqlRepositoryAdapter  implements InscriptionRepository
                 .toList();
     }
 
-
+    @Override
+    public void delete(Inscription inscription) {
+        inscriptionJpaRepository.delete(
+                inscriptionJpaRepository.findByEtudiant_MatriculeAndAnneeAcademique_Code(
+                inscription.getId().getMatricule().value(),
+                inscription.getId().getAnneeAcademiqueId().value()
+        ).get());
+    }
 }

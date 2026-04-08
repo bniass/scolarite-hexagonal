@@ -27,11 +27,8 @@ public class ConsulterAnneeAcademiqueService
     @Override
     public AnneeAcademiqueView executer(String code) {
 
-        String[] annees = code.split("-");
-
         AnneeAcademiqueId id = new AnneeAcademiqueId(
-                Integer.parseInt(annees[0]),
-                Integer.parseInt(annees[1])
+                Integer.parseInt(code)
         );
 
         AnneeAcademique annee = repository.findByCode(id.value())

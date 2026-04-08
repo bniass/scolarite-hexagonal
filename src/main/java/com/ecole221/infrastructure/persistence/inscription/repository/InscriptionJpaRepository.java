@@ -13,4 +13,10 @@ public interface InscriptionJpaRepository extends JpaRepository<InscriptionJpaEn
             String matricule,
             String codeAnnee
     );
+
+    boolean
+    existsByEtudiant_MatriculeAndAnneeAcademique_Code(
+            String matricule,
+            String codeAnnee
+    );
 }

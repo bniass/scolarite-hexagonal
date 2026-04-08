@@ -32,7 +32,7 @@ public class FermerInscriptionService
     public void executer(FermerInscriptionCommand cmd) {
 
         AnneeAcademiqueId id =
-                new AnneeAcademiqueId(cmd.codeAnnee(), cmd.codeAnnee() + 1) ;
+                new AnneeAcademiqueId(cmd.codeAnnee()) ;
 
         AnneeAcademique annee = repository.findByCode(id.value())
                 .orElseThrow(() ->

@@ -13,6 +13,7 @@ import com.ecole221.domain.event.shared.DomainEvent;
 import com.ecole221.domain.exception.AnneeAcadiqueException;
 import com.ecole221.domain.exception.ScolariteNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +33,12 @@ public class ModifierAnneeAcademiqueService
         this.eventPublisher = eventPublisher;
     }
 
+    @Transactional
     @Override
     public void executer(ModifierAnneeAcademiqueCommand cmd) {
 
         AnneeAcademiqueId id =
-                new AnneeAcademiqueId(cmd.codeAnnee(), cmd.codeAnnee() + 1);
+                new AnneeAcademiqueId(cmd.code());
 
         Optional<AnneeAcademique> annee = repository.findByCode(id.value());
         if (!annee.isPresent()) {
@@ -48,8 +50,8 @@ public class ModifierAnneeAcademiqueService
         AnneeAcademique toUpdated = annee.get();
         DatesAnnee datesAnnee = new DatesAnnee(cmd.dateDebut(),
                 cmd.dateFin(),
-                cmd.dateOuvertureInscription(),
-                cmd.dateFinInscription());
+                cmd.dateDebutInscriptions(),
+                cmd.dateFinInscriptions());
         toUpdated.modifier(datesAnnee);
 
         repository.save(toUpdated);

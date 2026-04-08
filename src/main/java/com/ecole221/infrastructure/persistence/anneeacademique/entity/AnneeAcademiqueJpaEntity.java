@@ -29,10 +29,15 @@ public class AnneeAcademiqueJpaEntity {
 
     private LocalDate datePublication;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "annee_mois",
-            joinColumns = @JoinColumn(name = "annee_id")
+    /* =======================
+       MOIS ACADEMIQUES
+       ======================= */
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
-    private List<MoisAcademiqueEmbeddable> moisAcademiques = new ArrayList<>();
+    @JoinColumn(name = "annee_id")
+    private List<AnneeMoisJpaEntity> moisAcademiques = new ArrayList<>();
 }

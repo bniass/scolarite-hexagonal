@@ -47,7 +47,7 @@ public abstract class AbstractEtatAnnee implements EtatAnnee {
 
     @Override
     public void fermerInscriptions(AnneeAcademique annee) {
-        throw new ScolariteException("Les inscriptions sont fermées");
+        interdit("fermer inscriptions");
     }
 }
 

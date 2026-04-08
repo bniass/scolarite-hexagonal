@@ -12,7 +12,7 @@ public class AnneeAcademiqueTest {
 
     @Test
     void creation_reussie_emet_evenement_creee_et_place_en_brouillon() {
-        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025, 2026));
+        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025));
 
         a.creer(datesValides());
 
@@ -25,7 +25,7 @@ public class AnneeAcademiqueTest {
 
     @Test
     void modification_est_autorisee_en_brouillon() {
-        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025, 2026));
+        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025));
         a.creer(datesValides());
 
         assertDoesNotThrow(() -> a.modifier(datesValides()));
@@ -33,7 +33,7 @@ public class AnneeAcademiqueTest {
 
     @Test
     void modification_est_interdite_apres_publication() {
-        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025, 2026));
+        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025));
         a.creer(datesValides());
         a.publier();
 
@@ -43,7 +43,7 @@ public class AnneeAcademiqueTest {
 
     @Test
     void suspendre_et_reouvrir_inscriptions() {
-        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025, 2026));
+        AnneeAcademique a = new AnneeAcademique(new AnneeAcademiqueId(2025));
         a.creer(datesValides());
         a.publier();
         a.ouvrirInscriptions();

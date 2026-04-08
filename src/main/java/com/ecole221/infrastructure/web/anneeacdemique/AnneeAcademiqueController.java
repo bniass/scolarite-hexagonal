@@ -19,6 +19,7 @@ public class AnneeAcademiqueController {
     private final OuvrirInscriptionUseCase ouvrirUC;
     private final CloturerAnneeScolaireUseCase cloturerUC;
     private final ConsulterAnneeAcademiqueUseCase consulterUC;
+    private final ModifierAnneeAcademiqueUseCase modifierUC;
 
     public AnneeAcademiqueController(
             SuspendreInscriptionUseCase suspendreUC, FermerInscriptionUseCase fermerUC,
@@ -26,7 +27,7 @@ public class AnneeAcademiqueController {
             PublierAnneeAcademiqueUseCase publierUC,
             OuvrirInscriptionUseCase ouvrirUC,
             CloturerAnneeScolaireUseCase cloturerUC,
-            ConsulterAnneeAcademiqueUseCase consulterUC
+            ConsulterAnneeAcademiqueUseCase consulterUC, ModifierAnneeAcademiqueUseCase modifierUC
     ) {
         this.suspendreUC = suspendreUC;
         this.fermerUC = fermerUC;
@@ -35,13 +36,14 @@ public class AnneeAcademiqueController {
         this.ouvrirUC = ouvrirUC;
         this.cloturerUC = cloturerUC;
         this.consulterUC = consulterUC;
+        this.modifierUC = modifierUC;
     }
 
     @PostMapping
     public ResponseEntity<Void> creer(@RequestBody CreerAnneeAcademiqueRequest request) {
         creerUC.executer(AnneeAcademiqueMapper.toCommand(request));
 
-        URI location = URI.create("/api/annees-academiques/" + request.code());
+        URI location = URI.create("/api/academic-years/" + request.code());
 
         return ResponseEntity
                 .created(location)
@@ -76,6 +78,12 @@ public class AnneeAcademiqueController {
     @PostMapping("/{code}/close")
     public ResponseEntity<Void> cloturer(@PathVariable String code) {
         cloturerUC.executer(new CloturerAnneeAcademiqueCommand(Integer.parseInt(code)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/update")
+    public ResponseEntity<Void> modifier(@RequestBody ModifierAnneeAcademiqueCommand request) {
+        modifierUC.executer(AnneeAcademiqueMapper.toModiferCommand(request));
         return ResponseEntity.ok().build();
     }
 

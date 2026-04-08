@@ -1,6 +1,6 @@
-package com.ecole221.domain.policy;
+package com.ecole221.domain.policy.inscription;
 
-import com.ecole221.domain.entity.school.Classe;
+import com.ecole221.domain.entity.school.CodeClasse;
 
 import java.time.LocalDate;
 
@@ -16,8 +16,8 @@ public class RegleTransfertSousDelai implements RegleTransfert {
     public boolean estAutorise(
             LocalDate dateInscription,
             LocalDate dateTransfert,
-            Classe classeSource,
-            Classe classeDestination
+            CodeClasse classeSource,
+            CodeClasse classeDestination
     ) {
         return !dateInscription
                 .plusMonths(delaiEnMois)

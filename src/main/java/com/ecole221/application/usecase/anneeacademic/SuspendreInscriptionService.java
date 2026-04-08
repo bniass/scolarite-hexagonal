@@ -30,7 +30,7 @@ public class SuspendreInscriptionService
     public void executer(SuspendreInscriptionCommand cmd) {
 
         AnneeAcademiqueId id =
-                new AnneeAcademiqueId(cmd.codeAnnee(), cmd.codeAnnee() + 1) ;
+                new AnneeAcademiqueId(cmd.codeAnnee()) ;
 
         AnneeAcademique annee = repository.findByCode(id.value())
                 .orElseThrow(() ->

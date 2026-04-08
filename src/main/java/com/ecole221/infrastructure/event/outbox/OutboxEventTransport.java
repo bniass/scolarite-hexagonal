@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class OutboxEventTransport {
 
     public void send(String payload) {
-        // Simule Kafka
+        // Simule ouh@Kafka
         log.info("OUTBOX EVENT SENT : {}", payload);
     }
 }

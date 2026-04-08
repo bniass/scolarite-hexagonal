@@ -11,7 +11,6 @@ public class AnneeBrouillon extends AbstractEtatAnnee {
         annee.initialiserDates(datesAnnee);
         annee.verifierDureeAnnee();
         annee.recalculerMois(annee.genererMoisAcademiques());
-        annee.addEvent(new AnneeAcademiqueCreeeEvent(annee));
     }
 
     @Override
@@ -25,6 +24,5 @@ public class AnneeBrouillon extends AbstractEtatAnnee {
     @Override
     public void publier(AnneeAcademique annee) {
         annee.changerEtat(new AnneePubliee());
-        annee.addEvent(new AnneeAcademiquePublieeEvent(annee));
     }
 }
