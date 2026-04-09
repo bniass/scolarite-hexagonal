@@ -4,5 +4,5 @@ import com.ecole221.application.command.iscription.CreerInscriptionCommand;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface CreerInscriptionUseCase {
-    void executer(CreerInscriptionCommand command, MultipartFile preuvePaiement);
+    byte[] executer(CreerInscriptionCommand command, MultipartFile preuvePaiement);
 }

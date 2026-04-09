@@ -4,5 +4,4 @@ public enum TypePaiement {
     FRAIS_INSCRIPTION,
     FRAIS_DIVERS,
     MENSUALITE,
-    DERNIER_MOIS
 }

@@ -7,6 +7,7 @@ import com.ecole221.domain.entity.academic.MoisAcademique;
 import com.ecole221.domain.entity.inscription.InscriptionCreationSnapshot;
 import com.ecole221.domain.entity.paiement.CanalPaiement;
 import com.ecole221.domain.entity.paiement.Paiement;
+import com.ecole221.domain.entity.paiement.PaiementId;
 import com.ecole221.domain.entity.paiement.StatutPaiement;
 import com.ecole221.domain.entity.school.Classe;
 import com.ecole221.domain.entity.school.Montant;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class PlanPaiementInitializer {
@@ -74,6 +76,8 @@ public class PlanPaiementInitializer {
             List<Paiement> paiements = new ArrayList<>();
             List<PaiementPersistenceContext> contexts = new ArrayList<>();
 
+            List<UUID> ids = new ArrayList<>();
+
         /* ============================================================
            1 - FRAIS INSCRIPTION
            ============================================================ */
@@ -82,6 +86,7 @@ public class PlanPaiementInitializer {
             fraisInscription.attribuerStatut(StatutPaiement.PAYE);
 
             paiements.add(fraisInscription);
+            ids.add(fraisInscription.getId().value());
 
             PaiementPersistenceContext contextFI =
                     PaiementFactory.creerPaiementPersistenceContexte(
@@ -99,6 +104,7 @@ public class PlanPaiementInitializer {
             fraisDivers.attribuerStatut(StatutPaiement.PAYE);
 
             paiements.add(fraisDivers);
+            ids.add(fraisDivers.getId().value());
 
             PaiementPersistenceContext contextFD =
                     PaiementFactory.creerPaiementPersistenceContexte(
@@ -115,6 +121,8 @@ public class PlanPaiementInitializer {
             for (MoisAcademique mois : moisPayes) {
                 Paiement paiementMensualite =
                         PaiementFactory.creerPaiementMensualite(cmd, mois);
+
+                ids.add(paiementMensualite.getId().value());
 
                 paiementMensualite.modifierMontantPrevu(classe.getMensualite());
                 paiementMensualite.attribuerStatut(StatutPaiement.PAYE);
@@ -159,6 +167,7 @@ public class PlanPaiementInitializer {
                 contexts.set(indexPaiementAModifier, nouveauContext);
             }
 
+
         /* ============================================================
            5 - MOIS IMPAYÉS
            ============================================================ */
@@ -192,7 +201,8 @@ public class PlanPaiementInitializer {
 
             return new PaiementProcessingResult(
                     paiements,
-                    contexts
+                    contexts,
+                    ids
             );
         } catch (ScolariteException e) {
             throw e;

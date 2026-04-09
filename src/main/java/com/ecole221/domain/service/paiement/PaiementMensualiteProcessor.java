@@ -122,7 +122,8 @@ public class PaiementMensualiteProcessor {
 
         return new PaiementProcessingResult(
                 paiementsAMettreAJour,
-                contexts
+                contexts,
+                paiementsAMettreAJour.stream().map(p->p.getId().value()).toList()
         );
     }
 

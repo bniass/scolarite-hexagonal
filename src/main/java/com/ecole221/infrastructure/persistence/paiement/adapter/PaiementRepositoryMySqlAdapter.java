@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @Transactional
@@ -93,6 +94,12 @@ public class PaiementRepositoryMySqlAdapter implements PaiementRepository {
     @Override
     public List<Paiement> findByMatriculeAndAnneeAcademiqueOrdered(String matricule, String anneeAcademique) {
         return jpaRepository.findByMatriculeAndAnneeAcademiqueOrderByMoisAcademiqueAnneeAscMoisAcademiqueMoisAsc(matricule, anneeAcademique)
+                .stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    public List<Paiement> findByIdIn(List<UUID> paiements) {
+        return jpaRepository.findByIdIn(paiements)
                 .stream().map(mapper::toDomain).toList();
     }
 

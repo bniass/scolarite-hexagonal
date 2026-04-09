@@ -58,4 +58,9 @@ public class InMemoryPaiementRepository implements PaiementRepository {
         return List.of();
     }
 
+    @Override
+    public List<Paiement> findByIdIn(List<UUID> paiements) {
+        return List.of();
+    }
+
 }

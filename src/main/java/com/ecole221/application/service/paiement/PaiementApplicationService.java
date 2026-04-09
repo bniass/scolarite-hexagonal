@@ -26,7 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-@Transactional
+//@Transactional
 public class PaiementApplicationService {
 
     private final PaiementRepository paiementRepository;
@@ -59,8 +59,8 @@ public class PaiementApplicationService {
        1️⃣ INITIALISATION DU PLAN ANNUEL (appelé à l'inscription)
        ============================================================ */
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void initialiserPlanPaiementAnnuel(InscriptionCreationSnapshot snapshot) {
+    //@Transactional(propagation = Propagation.REQUIRES_NEW)
+    public PaiementProcessingResult initialiserPlanPaiementAnnuel(InscriptionCreationSnapshot snapshot) {
         try {
             DeclarerPaiementCommand cmd =
                     paiementSnapshotMapper.toDeclarerPaiementCommand(
@@ -75,6 +75,7 @@ public class PaiementApplicationService {
                     moisTries
             );
             paiementRepository.saveAll(result.paiements(), result.contexts());
+            return result;
         } catch (Exception e) {
             throw new ScolariteException(e.getMessage());
         }

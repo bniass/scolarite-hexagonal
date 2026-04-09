@@ -1,6 +1,7 @@
 package com.ecole221.infrastructure.persistence.paiement.repository;
 
 import com.ecole221.domain.entity.paiement.Paiement;
+import com.ecole221.domain.entity.paiement.PaiementId;
 import com.ecole221.domain.entity.paiement.StatutPaiement;
 import com.ecole221.domain.entity.paiement.TypePaiement;
 import com.ecole221.infrastructure.persistence.paiement.entity.PaiementJpaEntity;
@@ -24,5 +25,7 @@ public interface PaiementJpaRepository extends JpaRepository<PaiementJpaEntity, 
     );
 
     List<PaiementJpaEntity> findByMatriculeAndAnneeAcademiqueOrderByMoisAcademiqueAnneeAscMoisAcademiqueMoisAsc(String matricule, String anneeAcademique);
+
+    List<PaiementJpaEntity> findByIdIn(List<UUID> paiements);
 
 }
